@@ -18,6 +18,7 @@ int main(int argc, char **args) {
   PetscInt i, j, Ii, J, Istart, Iend, m = 8, n = 7, its;
   PetscBool flg;
   PetscScalar v;
+  PetscViewer viewer;
 
   PetscFunctionBeginUser;
   PetscInitialize(&argc, &args, (char *)0, help);
@@ -119,6 +120,9 @@ int main(int argc, char **args) {
         (replacing the PETSC_DECIDE argument in the VecSetSizes() statement
         below).
   */
+  PetscViewerASCIIOpen(PETSC_COMM_WORLD, "output.m", &viewer);
+  PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+
   (VecCreate(PETSC_COMM_WORLD, &u));
   (VecSetSizes(u, PETSC_DECIDE, m * n));
   (VecSetFromOptions(u));
@@ -132,7 +136,9 @@ int main(int argc, char **args) {
   */
   (VecSet(u, 1.0));
   (MatMult(A, u, b));
-
+  MatView(A, viewer);
+  VecView(u, viewer);
+  PetscViewerDestroy(&viewer);
   /*
      View the exact solution vector if desired
   */
